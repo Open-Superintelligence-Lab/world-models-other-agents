@@ -22,7 +22,8 @@ ap.add_argument("--out", default="results.jsonl")
 a = ap.parse_args()
 done = set()
 if os.path.exists(a.out):
-    done = {(r["partner"], r["model"], r["k"], r["lr"], r["world"], r["tier"]) for r in map(json.loads, open(a.out))}
+    done = {(r["partner"], r["model"], r["k"], r["lr"], r["world"], r["tier"]) for r in map(json.loads, open(a.out))
+            if r.get("variant", "base") == "base"}
 for p, m, kk, lr, w in itertools.product(a.partners, a.models, a.ks, a.lrs, a.worlds):
     if m not in Mo.LEARNED and (kk != 1 or lr != a.lrs[0]):
         continue  # the simulators read neither k nor a learning rate

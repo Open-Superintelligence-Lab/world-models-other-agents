@@ -20,7 +20,7 @@ Multi-agent world models change the architecture, the data and the training toge
 
 ## Boring explanations to rule out
 
-1. The factored model wins because it has more weights. At k = 3 and `--h 256`, factored has 172,660 weights and joint 146,036 (18% fewer); `LeWM.test_weights()` reports them. A wider joint model is one `--h` away and should be run if C1 passes.
+1. The factored model wins because it has more weights. At k = 3 and the `5m` width, factored has 172,918 weights and joint 146,294 (18% fewer); every learned row stores `weights`, and `--match-size` widens joint to match (question 5 in QUESTIONS.md). A wider joint model is one `--h` away and should be run if C1 passes.
 2. It wins because it sees more history. Both use the same k in every claim.
 3. It wins only on easy episodes. Every comparison is paired on the same episodes and sampling seed.
 4. The partner never matters. K1 requires the partner-blind floor to lose at least 0.3 on reacting partners and to tie on the still one.
@@ -64,3 +64,4 @@ The rules are in `beat.py`. Each prediction is what we expect, so a result again
 - At the `7s` size, 0 of 6 episodes reached the goal for both learned models on chase and switch. On still, joint 0.33, factored 0.00, oracle 1.00. After 300 training steps the predictor misses about 65% of the latent's one-step change, and our dot's position after 8 imagined steps is off by 0.16. K2 will fail until training gets better.
 - The first table placed start, goal and partner at random. Planning that ignored the partner reached 1.00 on chase, because the partner was rarely in the way. Start and goal are now on opposite sides with the partner in between. On 60 tune episodes at the `1m` planner size, the oracle then reached 1.00, 1.00, 0.98 and 0.97 on still, patrol, chase and switch, and the blind floor 1.00, 0.70, 0.20 and 0.45.
 - A `block` partner that walks between us and the goal was dropped: see the README warning.
+- 2026-11-07: added the 16 questions in QUESTIONS.md, each one flag on `run.py`, plus `compare.py`. Rows now store `variant`; beat.py and kill.py read base rows only. Observations grew from 4 to 6 numbers (the optional third dot). The check "a factored model learns the patrol partner" was replaced: at 300 steps its error was 0.097 on one data seed and 0.137 on another, against 0.130 for "the partner stays still", so it passed or failed by luck. The new check asks the trained encoder to place both dots to within 0.08 (0.034 and 0.020).

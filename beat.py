@@ -27,8 +27,10 @@ def load(path):
     return [json.loads(x) for x in open(path)] if os.path.exists(path) else []
 
 
-def tuned(R, tier, partner, model, k, final=False):
-    c = [r for r in R if r["tier"] == tier and r["partner"] == partner and r["model"] == model and r["k"] == k and r["final"] == final]
+def tuned(R, tier, partner, model, k, final=False, variant="base"):
+    """The row with the best tune success over learning rates; claims and the kill test read base rows only."""
+    c = [r for r in R if r["tier"] == tier and r["partner"] == partner and r["model"] == model and r["k"] == k
+         and r["final"] == final and r.get("variant", "base") == variant]
     return max(c, key=lambda r: (np.mean(r["tune"]["success"]), -np.mean(r["tune"].get("other_err", [0])))) if c else None
 
 

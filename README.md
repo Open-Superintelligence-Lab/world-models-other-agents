@@ -3,7 +3,7 @@
 > [!IMPORTANT]
 > We are using this environment to write a paper for ICML 2027. It was built in [AI Research School](https://www.skool.com/become-ai-researcher-2669). The code is under the MIT licence, so you can use the code and ideas in your own work.
 >
-> **This is a setup, and it has no results yet.** Bug checks pass on known answers, and every partner and model has run end to end at the 7-second size. At that size the learned world models are undertrained: against the partner that never moves, `joint` reached the goal in 2 of 6 episodes and the true simulator in 6 of 6. No kill-test or claim row has run.
+> **This is a setup, and it has no results yet.** The questions to answer, each one flag away, are in [QUESTIONS.md](QUESTIONS.md). Bug checks pass on known answers, and every partner and model has run end to end at the 7-second size. At that size the learned world models are undertrained: against the partner that never moves, `joint` reached the goal in 2 of 6 episodes and the true simulator in 6 of 6. No kill-test or claim row has run.
 
 ## Ask whether the other agent needs its own model
 
@@ -34,6 +34,7 @@ This came from polls in AI Research School and on RedNote and Douyin, where worl
 | **Probe** | The planner's cost needs both positions, so a small network reads the 4 positions from a latent. It is fitted after training on the frozen encoder, and both learned models get the same one. LeWM plans towards a goal picture instead; that can't work here, because a goal picture would also fix where the partner is. |
 | **Planning** | `run.py`: the cross-entropy method over our next H actions, replanning every step. Cost: distance to the goal plus a penalty whenever the imagined dots come close to touching. |
 | **Scores** | Per episode: `success` (goal reached before touching) and `touched`. For learned models also `other_err` and `me_err`, the distance between imagined and true positions after H steps of recorded actions, and `still_err`, the partner error of assuming it stays put. |
+| **Questions** | [QUESTIONS.md](QUESTIONS.md): 16 questions that remove, add or change one part of the model or its data, each one flag on `run.py`. `compare.py` prints each variant next to the base model. |
 | **Rules** | `kill.py` is the kill test and `beat.py` holds the three claims, both written before any comparison ran. `python3 beat.py --selftest` runs the rules on made-up rows. |
 
 ---
@@ -45,7 +46,7 @@ pip install -r requirements.txt
 python3 check.py
 ```
 
-`check.py` takes about 7 seconds on one CPU thread, and `--slow` adds a 7-second-tier row for every partner and model through `run.py` (about 50 seconds in all). Its known answers: splits are different episodes; the still partner never moves; the patrol partner stays on its circle; the chaser closes in; the switching partner flips exactly on its period; the simulator's rollout is the true step sequence; with a still partner, planning that ignores it gives exactly the same outcomes as the truth; with a chaser, ignoring it drops success from 0.96 to 0.21; the factored model's second latent half has zero gradient from our current action and the joint model's doesn't; planning from pictures equals planning from pre-encoded latents; a factored model learns the patrol partner (error 0.075 against 0.130 for assuming it stays put).
+`check.py` takes about 7 seconds on one CPU thread, and `--slow` adds a 7-second-tier row for every partner, model and question flag through `run.py` (about 2 minutes in all). Its known answers: splits are different episodes; the still partner never moves; the patrol partner stays on its circle; the chaser closes in; the switching partner flips exactly on its period; the simulator's rollout is the true step sequence; with a still partner, planning that ignores it gives exactly the same outcomes as the truth; with a chaser, ignoring it drops success from 0.96 to 0.21; the factored model's second latent half has zero gradient from our current action and the joint model's doesn't; planning from pictures equals planning from pre-encoded latents; after 200 training steps the latent holds both dots (a probe places them to within 0.034 and 0.020); the instant partner chases our post-move position; the optional third dot moves, stays on the table and changes nothing else; a size-matched joint model is within 2% of factored's weights.
 
 At the 7-second size, on 6 episodes each, no learned model reached the goal against chase or switch. Against the still partner `joint` reached 0.33, `factored` 0.00 and `oracle` 1.00. The first job is to make the learned models plan well at small sizes.
 
