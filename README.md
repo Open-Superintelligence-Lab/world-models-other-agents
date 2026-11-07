@@ -34,7 +34,7 @@ This came from polls in AI Research School and on RedNote and Douyin, where worl
 | **Probe** | The planner's cost needs both positions, so a small network reads the 4 positions from a latent. It is fitted after training on the frozen encoder, and both learned models get the same one. LeWM plans towards a goal picture instead; that can't work here, because a goal picture would also fix where the partner is. |
 | **Planning** | `run.py`: the cross-entropy method over our next H actions, replanning every step. Cost: distance to the goal plus a penalty whenever the imagined dots come close to touching. |
 | **Scores** | Per episode: `success` (goal reached before touching) and `touched`. For learned models also `other_err` and `me_err`, the distance between imagined and true positions after H steps of recorded actions, and `still_err`, the partner error of assuming it stays put. |
-| **Questions** | [QUESTIONS.md](QUESTIONS.md): 16 questions that remove, add or change one part of the model or its data, each one flag on `run.py`. `compare.py` prints each variant next to the base model. |
+| **Questions** | [QUESTIONS.md](QUESTIONS.md): 15 questions that remove, add or change one part of the model or its data, each one flag on `run.py`. `compare.py` prints each variant next to the base model. |
 | **Rules** | `kill.py` is the kill test and `beat.py` holds the three claims, both written before any comparison ran. `python3 beat.py --selftest` runs the rules on made-up rows. |
 
 ---

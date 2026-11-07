@@ -28,10 +28,10 @@ Each row of the output is one partner, model and setting. `success` is the share
 
 ## Remove a part
 
-**1. Remove SIGReg.** SIGReg is the term that keeps the latent spread out, so the encoder can't map every picture to the same numbers. Does planning fail without it, and does the model lose the partner before it loses our own dot? Compare `me_err` and `other_err`.
+**1. Remove SIGReg, or change its weight.** SIGReg is the term that keeps the latent spread out, so the encoder can't map every picture to the same numbers. Does planning fail without it, and does the model lose the partner before it loses our own dot? Compare `me_err` and `other_err`. Then try weights 0.01 and 1 against the base 0.1: does a strong weight blur small details, such as which way the partner is heading?
 
 ```bash
-for m in joint factored; do for p in chase switch; do python3 run.py --tier 1m --model $m --partner $p --k 3 --sigreg 0; done; done
+for w in 0 0.01 1; do for m in joint factored; do for p in chase switch; do python3 run.py --tier 1m --model $m --partner $p --k 3 --sigreg $w; done; done; done
 ```
 
 **2. Remove our action from the predictor.** The predictor then sees only the past pictures. How much worse does planning get? This shows how much the model uses our move at all. Expect `me_err` to rise a lot. If `other_err` rises too, the model was using our move to predict the partner.
@@ -119,13 +119,7 @@ python3 compare.py --tier 1m --results halves.jsonl
 for d in 8 16 64; do for m in joint factored; do for p in chase switch; do python3 run.py --tier 1m --model $m --partner $p --k 3 --latent $d; done; done; done
 ```
 
-**15. What does the SIGReg weight do?** Try 0.01 and 1 against the base 0.1. Does a strong weight blur small details, such as which way the partner is heading?
-
-```bash
-for w in 0.01 1; do for m in joint factored; do for p in chase switch; do python3 run.py --tier 1m --model $m --partner $p --k 3 --sigreg $w; done; done; done
-```
-
-**16. What does the picture size do?** Try 32 pixels against the base 16. A dot is about 2 pixels wide at 16. Does a sharper picture make the positions, and so the plans, more accurate?
+**15. What does the picture size do?** Try 32 pixels against the base 16. A dot is about 2 pixels wide at 16. Does a sharper picture make the positions, and so the plans, more accurate?
 
 ```bash
 for m in joint factored; do for p in chase switch; do python3 run.py --tier 1m --model $m --partner $p --k 3 --img 32; done; done
